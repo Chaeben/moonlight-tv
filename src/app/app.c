@@ -25,6 +25,9 @@
 #include "app_error.h"
 #include "app_session.h"
 #include "stream/embed_wrapper.h"
+#if TARGET_WEBOS
+#include "platform/webos/gamepad_grab_webos.h"
+#endif
 
 PCONFIGURATION app_configuration = NULL;
 
@@ -97,6 +100,9 @@ int app_init(app_t *app, app_settings_loader *settings_loader, int argc, char *a
 }
 
 void app_deinit(app_t *app) {
+#if TARGET_WEBOS
+    webos_gamepad_grab_update(false);
+#endif
     app_bus_drain();
     app_session_destroy(app);
     app_ui_close(&app->ui);
@@ -129,6 +135,9 @@ void app_deinit(app_t *app) {
 
 void app_run_loop(app_t *app) {
     app_process_events(app);
+#if TARGET_WEBOS
+    webos_gamepad_grab_update(app->session != NULL && session_has_input(app->session));
+#endif
     lv_task_handler();
     SDL_Delay(1);
 }
