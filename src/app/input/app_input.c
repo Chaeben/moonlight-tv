@@ -2,11 +2,16 @@
 #include "logging.h"
 #include "app.h"
 #include "input_gamepad_mapping.h"
+#include <SDL_hints.h>
 
 #include "lvgl/lv_sdl_drv_input.h"
 
 void app_input_init(app_input_t *input, app_t *app) {
     input->app = app;
+#ifdef TARGET_WEBOS
+    // webOS exposes its virtual Smart Remote input as a game controller.
+    SDL_SetHint(SDL_HINT_GAMECONTROLLER_IGNORE_DEVICES, "0x9998/0x9998");
+#endif
     if (app->settings.condb_path != NULL) {
         app_input_copy_initial_gamepad_mapping(&app->settings);
 #if SDL_VERSION_ATLEAST(2, 0, 10)
